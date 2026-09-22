@@ -15,4 +15,17 @@ public class PlayerProfile
         Name = name;
         Bank = 1000;
     }
+    public PlayerProfile(string name, int bank)
+    {
+        Name = name;
+        Bank = bank;
+    }
+    public void AddMoney(int amount)
+    {
+        Bank += amount;
+    }
+    public void RemoveMoney(int amount)
+    {
+        Bank -= amount;
+    }
 }

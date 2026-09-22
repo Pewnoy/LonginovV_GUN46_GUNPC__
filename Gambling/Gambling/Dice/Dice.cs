@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Gambling.DiceGame;
+namespace Gambling.DiceData;
 
 public readonly struct Dice
 {

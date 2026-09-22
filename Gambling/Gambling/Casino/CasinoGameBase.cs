@@ -13,10 +13,6 @@ public abstract class CasinoGameBase
     public event Action? OnLoose;
 
     public event Action? OnDraw;
-    protected CasinoGameBase()
-    {
-        FactoryMethod();
-    }
 
     public abstract void PlayGame();
     protected abstract void FactoryMethod();

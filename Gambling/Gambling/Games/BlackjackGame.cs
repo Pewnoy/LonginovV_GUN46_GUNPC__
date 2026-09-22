@@ -7,7 +7,7 @@ namespace Gambling.Games;
 
 public class BlackjackGame : CasinoGameBase
 {
-    private readonly Queue<Card> Deck;
+    private readonly Queue<Card> Deck = new();
     private readonly int _cardCount;
     public BlackjackGame(int cardCount)
     {
@@ -15,9 +15,8 @@ public class BlackjackGame : CasinoGameBase
         {
             throw new ArgumentException("Card count must be at least 4.");
         }
-
         _cardCount = cardCount;
-        Deck = new Queue<Card>();
+        FactoryMethod();
     }
 
     public override void PlayGame()

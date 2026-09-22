@@ -34,4 +34,13 @@ public class FileSystemSaveLoadService : ISaveLoadService<string>
 
         return File.ReadAllText(filePath);
     }
+    public void DeleteData(string identifier)
+    {
+        string filePath = Path.Combine(_path, identifier + ".txt");
+
+        if (File.Exists(filePath))
+        {
+            File.Delete(filePath);
+        }
+    }
 }

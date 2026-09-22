@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Gambling.DiceGame;
+using Gambling.DiceData;
 
 namespace Gambling.Games;
 
