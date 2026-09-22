@@ -28,4 +28,8 @@ public class PlayerProfile
     {
         Bank -= amount;
     }
+    public void SetBank(int amount)
+    {
+        Bank = amount;
+    }
 }

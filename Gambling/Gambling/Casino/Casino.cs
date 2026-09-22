@@ -12,6 +12,7 @@ public class Casino : IGame
 {
     private readonly ISaveLoadService<string> _saveService;
     private PlayerProfile? _player;
+    private const int MaxBank = 100000;
     private readonly BlackjackGame _blackjack;
     private readonly DiceGame _diceGame;
     public Casino()
@@ -31,17 +32,32 @@ public class Casino : IGame
     public void StartGame()
     {
         Console.WriteLine("Welcome to Casino!");
-        LoadPlayer();
+
+        string data = _saveService.LoadData("Player");
+
+        if (!string.IsNullOrEmpty(data))
+        {
+            Console.WriteLine("1 - Continue game");
+            Console.WriteLine("2 - Delete profile");
+
+            string? menu = Console.ReadLine();
+
+            if (menu == "2")
+            {
+                ((FileSystemSaveLoadService)_saveService).DeleteData("Player");
+                Console.WriteLine("Profile deleted.");
+                return;
+            }
+        }
+        LoadPlayer(data);
         Console.WriteLine($"Hello, {_player!.Name}");
         Console.WriteLine($"Your bank: {_player.Bank}");
         ChooseGame();
         SavePlayer();
-
         Console.WriteLine("Goodbye!");
     }
-    private void LoadPlayer()
+    private void LoadPlayer(string data)
     {
-        string data = _saveService.LoadData("Player");
         if (string.IsNullOrEmpty(data))
         {
             Console.Write("Enter your name: ");
@@ -51,6 +67,7 @@ public class Casino : IGame
                 name = "Unknown";
             }
             _player = new PlayerProfile(name);
+            SavePlayer();
         }
         else
         {
@@ -66,9 +83,13 @@ public class Casino : IGame
 
         string? input = Console.ReadLine();
         Console.WriteLine($"Your bank: {_player!.Bank}");
+        
         Console.Write("Enter your bet: ");
-
-        int bet = Convert.ToInt32(Console.ReadLine());
+        if (!int.TryParse(Console.ReadLine(), out int bet))
+        {
+            Console.WriteLine("Invalid bet.");
+            return;
+        }
         _currentBet = bet;
         if (bet <= 0 || bet > _player.Bank)
         {
@@ -99,6 +120,12 @@ public class Casino : IGame
     {
         Console.WriteLine("You win!");
         _player!.AddMoney(_currentBet * 2);
+        if (_player.Bank > MaxBank)
+        {
+            Console.WriteLine("You broke the casino! A new one will be built here.");
+            _player.SetBank(MaxBank);
+        }
+
         Console.WriteLine($"Your bank: {_player.Bank}");
     }
 
