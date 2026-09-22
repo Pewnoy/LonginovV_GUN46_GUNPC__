@@ -10,9 +10,6 @@
   <ItemGroup>
     <Folder Include="Casino\" />
     <Folder Include="Games\" />
-    <Folder Include="Cards\" />
-    <Folder Include="Dice\" />
-    <Folder Include="SaveLoad\" />
   </ItemGroup>
 
 </Project>
