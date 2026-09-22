@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using Gambling.DiceData;
+using Gambling.Dicedata;
 
 namespace Gambling.Games;
 
@@ -9,6 +8,8 @@ public class DiceGame : CasinoGameBase
 {
     private readonly List<Dice> _dice;
     private readonly int _diceCount;
+    private readonly int _minValue;
+    private readonly int _maxValue;
     public DiceGame(int diceCount, int minValue, int maxValue)
     {
         if (diceCount < 1)
@@ -16,8 +17,11 @@ public class DiceGame : CasinoGameBase
             throw new ArgumentException("Dice count must be greater than zero.");
         }
         _diceCount = diceCount;
+        _minValue = minValue;
+        _maxValue = maxValue;
         _dice = new List<Dice>();
-        CreateDice(minValue, maxValue);
+
+        FactoryMethod();
     }
 
     public override void PlayGame()
@@ -30,19 +34,13 @@ public class DiceGame : CasinoGameBase
 
         CheckResult(playerScore, computerScore);
     }
-
     protected override void FactoryMethod()
-    {
-    }
-
-    private void CreateDice(int minValue, int maxValue)
     {
         for (int i = 0; i < _diceCount; i++)
         {
-            _dice.Add(new Dice(minValue, maxValue));
+            _dice.Add(new Dice(_minValue, _maxValue));
         }
     }
-
     private int RollDice()
     {
         int result = 0;

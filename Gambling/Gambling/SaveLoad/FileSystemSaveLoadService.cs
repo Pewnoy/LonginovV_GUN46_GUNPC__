@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.IO;
 
 namespace Gambling.SaveLoad;
@@ -17,22 +15,35 @@ public class FileSystemSaveLoadService : ISaveLoadService<string>
             Directory.CreateDirectory(_path);
         }
     }
-
     public void SaveData(string data, string identifier)
     {
-        string filePath = Path.Combine(_path, identifier + ".txt");
-        File.WriteAllText(filePath, data);
+        try
+        {
+            string filePath = Path.Combine(_path, identifier + ".txt");
+            File.WriteAllText(filePath, data);
+        }
+        catch (Exception exception)
+        {
+            Console.WriteLine($"Save error: {exception.Message}");
+        }
     }
 
     public string LoadData(string identifier)
     {
-        string filePath = Path.Combine(_path, identifier + ".txt");
-        if (!File.Exists(filePath))
+        try
         {
+            string filePath = Path.Combine(_path, identifier + ".txt");
+            if (!File.Exists(filePath))
+            {
+                return string.Empty;
+            }
+            return File.ReadAllText(filePath);
+        }
+        catch (Exception exception)
+        {
+            Console.WriteLine($"Load error: {exception.Message}");
             return string.Empty;
         }
-
-        return File.ReadAllText(filePath);
     }
     public void DeleteData(string identifier)
     {

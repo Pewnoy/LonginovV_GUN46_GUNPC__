@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Gambling.Player;
+﻿namespace Gambling.Player;
 
 public class PlayerProfile
 {

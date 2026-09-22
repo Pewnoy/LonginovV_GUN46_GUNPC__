@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System;
 using Gambling.Games;
 using Gambling.Player;
 using Gambling.SaveLoad;
@@ -75,6 +72,7 @@ public class Casino : IGame
             _player = new PlayerProfile( playerData[0], Convert.ToInt32(playerData[1]));
         }
     }
+    
     private void ChooseGame()
     {
         Console.WriteLine("Choose game:");

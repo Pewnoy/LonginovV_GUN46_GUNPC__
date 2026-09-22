@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Gambling.Cards;
+﻿namespace Gambling.Cards;
 public readonly struct Card
 {
     public CardSuit Suit { get; }

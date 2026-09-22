@@ -99,7 +99,14 @@ public class BlackjackGame : CasinoGameBase
         int score = 0;
         foreach (Card card in cards)
         {
-            score += (int)card.Value;
+            if ((int)card.Value >= 10)
+            {
+                score += 10;
+            }
+            else
+            {
+                score += (int)card.Value;
+            }
         }
 
         return score;
