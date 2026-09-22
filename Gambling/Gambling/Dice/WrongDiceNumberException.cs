@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Gambling.Dice;
+namespace Gambling.DiceGame;
+
 public class WrongDiceNumberException : Exception
 {
     public WrongDiceNumberException(string message)
