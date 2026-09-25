@@ -97,9 +97,15 @@ public class BlackjackGame : CasinoGameBase
     private int CalculateScore(List<Card> cards)
     {
         int score = 0;
+        int aceCount = 0;
         foreach (Card card in cards)
         {
-            if ((int)card.Value >= 10)
+            if (card.Value == CardValue.Ace)
+            {
+                score += 11;
+                aceCount++;
+            }
+            else if ((int)card.Value >= 10)
             {
                 score += 10;
             }
@@ -108,7 +114,11 @@ public class BlackjackGame : CasinoGameBase
                 score += (int)card.Value;
             }
         }
-
+        while (score > 21 && aceCount > 0)
+        {
+            score -= 10;
+            aceCount--;
+        }
         return score;
     }
 

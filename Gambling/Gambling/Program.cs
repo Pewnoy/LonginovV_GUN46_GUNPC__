@@ -1,3 +1,3 @@
 ﻿using Gambling.Casino;
-Casino casino = new();
-casino.StartGame();
+IGame game = new Casino();
+game.StartGame();

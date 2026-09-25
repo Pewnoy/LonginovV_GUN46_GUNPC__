@@ -41,7 +41,7 @@ public class Casino : IGame
 
             if (menu == "2")
             {
-                ((FileSystemSaveLoadService)_saveService).DeleteData("Player");
+                _saveService.DeleteData("Player");
                 Console.WriteLine("Profile deleted.");
                 return;
             }
@@ -78,10 +78,13 @@ public class Casino : IGame
         Console.WriteLine("Choose game:");
         Console.WriteLine("1 - Blackjack");
         Console.WriteLine("2 - Dice");
-
         string? input = Console.ReadLine();
+        if (input != "1" && input != "2")
+        {
+            Console.WriteLine("Invalid game.");
+            return;
+        }
         Console.WriteLine($"Your bank: {_player!.Bank}");
-        
         Console.Write("Enter your bet: ");
         if (!int.TryParse(Console.ReadLine(), out int bet))
         {

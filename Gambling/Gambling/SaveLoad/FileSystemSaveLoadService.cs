@@ -19,7 +19,7 @@ public class FileSystemSaveLoadService : ISaveLoadService<string>
     {
         try
         {
-            string filePath = Path.Combine(_path, identifier + ".txt");
+         string filePath = Path.Combine(_path, identifier + ".txt");
             File.WriteAllText(filePath, data);
         }
         catch (Exception exception)

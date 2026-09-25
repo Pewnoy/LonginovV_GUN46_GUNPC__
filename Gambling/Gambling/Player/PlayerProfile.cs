@@ -3,9 +3,7 @@
 public class PlayerProfile
 {
     public string Name { get; private set; }
-
     public int Bank { get; private set; }
-
     public PlayerProfile(string name)
     {
         Name = name;
@@ -14,18 +12,28 @@ public class PlayerProfile
     public PlayerProfile(string name, int bank)
     {
         Name = name;
-        Bank = bank;
+        Bank = bank >= 0 ? bank : 0;
     }
     public void AddMoney(int amount)
     {
-        Bank += amount;
+        if (amount > 0)
+        {
+            Bank += amount;
+        }
     }
     public void RemoveMoney(int amount)
     {
-        Bank -= amount;
+        if (amount > 0 && amount <= Bank)
+        {
+            Bank -= amount;
+        }
     }
+
     public void SetBank(int amount)
     {
-        Bank = amount;
+        if (amount >= 0)
+        {
+            Bank = amount;
+        }
     }
 }
