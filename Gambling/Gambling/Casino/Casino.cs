@@ -91,43 +91,70 @@ public class Casino : IGame
     {
         if (string.IsNullOrEmpty(data))
         {
-            Console.Write("Enter your name: ");
-            string? name = Console.ReadLine();
-
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                name = "Unknown";
-            }
-
-            _player = new PlayerProfile(name);
-            SavePlayer();
+            CreateNewPlayer();
+            return;
         }
-        else
+        string[] playerData = data.Split(';');
+        if (playerData.Length < 2)
         {
-            string[] playerData = data.Split(';');
-            string name = playerData[0];
-            int bank = Convert.ToInt32(playerData[1]);
-
-            int gamesPlayed = 0;
-            int wins = 0;
-            int losses = 0;
-            int draws = 0;
-
-            if (playerData.Length >= 6)
-            {
-                gamesPlayed = Convert.ToInt32(playerData[2]);
-                wins = Convert.ToInt32(playerData[3]);
-                losses = Convert.ToInt32(playerData[4]);
-                draws = Convert.ToInt32(playerData[5]);
-            }
-            _player = new PlayerProfile(
-                name,
-                bank,
-                gamesPlayed,
-                wins,
-                losses,
-                draws);
+            Console.WriteLine("Save file is corrupted.");
+            Console.WriteLine("Creating a new profile.");
+            CreateNewPlayer();
+            return;
         }
+        if (!int.TryParse(playerData[1], out int bank))
+        {
+            Console.WriteLine("Save file is corrupted.");
+            Console.WriteLine("Creating a new profile.");
+            CreateNewPlayer();
+            return;
+        }
+        int gamesPlayed = 0;
+        int wins = 0;
+        int losses = 0;
+        int draws = 0;
+
+        if (playerData.Length >= 6)
+        {
+            if (!int.TryParse(playerData[2], out gamesPlayed) ||
+                !int.TryParse(playerData[3], out wins) ||
+                !int.TryParse(playerData[4], out losses) ||
+                !int.TryParse(playerData[5], out draws))
+            {
+                Console.WriteLine("Save file is corrupted.");
+                Console.WriteLine("Creating a new profile.");
+                CreateNewPlayer();
+                return;
+            }
+        }
+        if (string.IsNullOrWhiteSpace(playerData[0]))
+        {
+            Console.WriteLine("Save file is corrupted.");
+            Console.WriteLine("Creating a new profile.");
+            CreateNewPlayer();
+            return;
+        }
+        _player = new PlayerProfile(
+            playerData[0],
+            bank,
+            gamesPlayed,
+            wins,
+            losses,
+            draws);
+
+        Console.WriteLine($"Hello, {_player.Name}");
+        Console.WriteLine($"Your bank: {_player.Bank}");
+    }
+    private void CreateNewPlayer()
+    {
+        Console.Write("Enter your name: ");
+        string? name = Console.ReadLine();
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            name = "Unknown";
+        }
+        _player = new PlayerProfile(name);
+        SavePlayer();
         Console.WriteLine($"Hello, {_player.Name}");
         Console.WriteLine($"Your bank: {_player.Bank}");
     }
