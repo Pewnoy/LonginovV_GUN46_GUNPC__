@@ -10,8 +10,13 @@ public class Casino : IGame
     private readonly ISaveLoadService<string> _saveService;
     private PlayerProfile? _player;
     private const int MaxBank = 100000;
+    private const int MinBet = 10;
+    private const int MaxBet = 10000;
     private readonly BlackjackGame _blackjack;
     private readonly DiceGame _diceGame;
+    private string _selectedGame = "";
+    private int _currentBet;
+    private bool _leaveCasino;
     public Casino()
     {
         _saveService = new FileSystemSaveLoadService("Saves");
@@ -28,28 +33,57 @@ public class Casino : IGame
     }
     public void StartGame()
     {
-        Console.WriteLine("Welcome to Casino!");
+        Console.WriteLine("====================");
+        Console.WriteLine("       CASINO");
+        Console.WriteLine("====================");
+        Console.WriteLine();
 
         string data = _saveService.LoadData("Player");
 
-        if (!string.IsNullOrEmpty(data))
+        LoadPlayer(data);
+
+        while (true)
         {
-            Console.WriteLine("1 - Continue game");
-            Console.WriteLine("2 - Delete profile");
+            Console.WriteLine();
+            Console.WriteLine("====================");
+            Console.WriteLine("       MAIN MENU");
+            Console.WriteLine("====================");
+            Console.WriteLine("1 - Play");
+            Console.WriteLine("2 - Profile");
+            Console.WriteLine("3 - Delete profile");
+            Console.WriteLine("4 - Exit");
 
-            string? menu = Console.ReadLine();
+            string? choice = Console.ReadLine();
 
-            if (menu == "2")
+            if (choice == "1")
+            {
+                ChooseGame();
+                PlayGameLoop();
+
+                if (_leaveCasino)
+                {
+                    break;
+                }
+            }
+            else if (choice == "2")
+            {
+                ShowProfile();
+            }
+            else if (choice == "3")
             {
                 _saveService.DeleteData("Player");
                 Console.WriteLine("Profile deleted.");
                 return;
             }
+            else if (choice == "4")
+            {
+                break;
+            }
+            else
+            {
+                Console.WriteLine("Invalid choice.");
+            }
         }
-        LoadPlayer(data);
-        Console.WriteLine($"Hello, {_player!.Name}");
-        Console.WriteLine($"Your bank: {_player.Bank}");
-        ChooseGame();
         SavePlayer();
         Console.WriteLine("Goodbye!");
     }
@@ -59,87 +93,197 @@ public class Casino : IGame
         {
             Console.Write("Enter your name: ");
             string? name = Console.ReadLine();
+
             if (string.IsNullOrWhiteSpace(name))
             {
                 name = "Unknown";
             }
+
             _player = new PlayerProfile(name);
             SavePlayer();
         }
         else
         {
             string[] playerData = data.Split(';');
-            _player = new PlayerProfile( playerData[0], Convert.ToInt32(playerData[1]));
+            string name = playerData[0];
+            int bank = Convert.ToInt32(playerData[1]);
+
+            int gamesPlayed = 0;
+            int wins = 0;
+            int losses = 0;
+            int draws = 0;
+
+            if (playerData.Length >= 6)
+            {
+                gamesPlayed = Convert.ToInt32(playerData[2]);
+                wins = Convert.ToInt32(playerData[3]);
+                losses = Convert.ToInt32(playerData[4]);
+                draws = Convert.ToInt32(playerData[5]);
+            }
+            _player = new PlayerProfile(
+                name,
+                bank,
+                gamesPlayed,
+                wins,
+                losses,
+                draws);
         }
+        Console.WriteLine($"Hello, {_player.Name}");
+        Console.WriteLine($"Your bank: {_player.Bank}");
     }
-    
+    private void ShowProfile()
+    {
+        Console.WriteLine();
+        Console.WriteLine("====================");
+        Console.WriteLine("       PROFILE");
+        Console.WriteLine("====================");
+        Console.WriteLine($"Name: {_player!.Name}");
+        Console.WriteLine($"Bank: {_player.Bank}");
+        Console.WriteLine($"Games played: {_player.GamesPlayed}");
+        Console.WriteLine($"Wins: {_player.Wins}");
+        Console.WriteLine($"Losses: {_player.Losses}");
+        Console.WriteLine($"Draws: {_player.Draws}");
+    }
     private void ChooseGame()
     {
-        Console.WriteLine("Choose game:");
-        Console.WriteLine("1 - Blackjack");
-        Console.WriteLine("2 - Dice");
-        string? input = Console.ReadLine();
-        if (input != "1" && input != "2")
+        while (true)
         {
+            Console.WriteLine();
+            Console.WriteLine("Choose game:");
+            Console.WriteLine("1 - Blackjack");
+            Console.WriteLine("2 - Dice");
+
+            string? input = Console.ReadLine();
+
+            if (input == "1" || input == "2")
+            {
+                _selectedGame = input;
+                return;
+            }
             Console.WriteLine("Invalid game.");
+        }
+    }
+    private void PlayGameLoop()
+    {
+        while (true)
+        {
+            PlaySelectedGame();
+
+            if (_leaveCasino)
+            {
+                break;
+            }
+            Console.WriteLine();
+            Console.WriteLine("1 - Play again");
+            Console.WriteLine("2 - Change game");
+            Console.WriteLine("3 - Back to main menu");
+
+            string? choice = Console.ReadLine();
+
+            if (choice == "1")
+            {
+                continue;
+            }
+            if (choice == "2")
+            {
+                ChooseGame();
+                continue;
+            }
+            break;
+        }
+    }
+    private void PlaySelectedGame()
+    {
+        if (_selectedGame != "1" && _selectedGame != "2")
+        {
             return;
         }
+        Console.WriteLine();
         Console.WriteLine($"Your bank: {_player!.Bank}");
+        Console.WriteLine($"Minimum bet: {MinBet}");
+        Console.WriteLine($"Maximum bet: {MaxBet}");
         Console.Write("Enter your bet: ");
         if (!int.TryParse(Console.ReadLine(), out int bet))
         {
             Console.WriteLine("Invalid bet.");
             return;
         }
-        _currentBet = bet;
-        if (bet <= 0 || bet > _player.Bank)
+        if (bet < MinBet)
         {
-            Console.WriteLine("Invalid bet.");
-
+            Console.WriteLine($"Minimum bet is {MinBet}.");
+            Console.WriteLine("Press Enter to continue...");
+            Console.ReadLine();
             return;
         }
+        if (bet > MaxBet)
+        {
+            Console.WriteLine($"Maximum bet is {MaxBet}.");
+            Console.WriteLine("Press Enter to continue...");
+            Console.ReadLine();
+            return;
+        }
+        if (bet > _player.Bank)
+        {
+            Console.WriteLine("You don't have enough money.");
+            return;
+        }
+        _currentBet = bet;
         _player.RemoveMoney(bet);
-        if (input == "1")
+        if (_selectedGame == "1")
         {
             _blackjack.PlayGame();
         }
-        else if (input == "2")
+        else if (_selectedGame == "2")
         {
             _diceGame.PlayGame();
         }
+        SavePlayer();
     }
     private void SavePlayer()
     {
         if (_player != null)
         {
-            string data = $"{_player.Name};{_player.Bank}";
+            string data =
+                $"{_player.Name};" +
+                $"{_player.Bank};" +
+                $"{_player.GamesPlayed};" +
+                $"{_player.Wins};" +
+                $"{_player.Losses};" +
+                $"{_player.Draws}";
+
             _saveService.SaveData(data, "Player");
         }
     }
-    private int _currentBet;
     private void WinMessage()
     {
         Console.WriteLine("You win!");
-        _player!.AddMoney(_currentBet * 2);
+        _player!.AddWin();
+        _player.AddMoney(_currentBet * 2);
         if (_player.Bank > MaxBank)
         {
             Console.WriteLine("You broke the casino! A new one will be built here.");
             _player.SetBank(MaxBank);
         }
-
         Console.WriteLine($"Your bank: {_player.Bank}");
     }
 
     private void LooseMessage()
     {
         Console.WriteLine("You lose!");
-        Console.WriteLine($"Your bank: {_player!.Bank}");
+        _player!.AddLoss();
+        Console.WriteLine($"Your bank: {_player.Bank}");
+        if (_player.Bank == 0)
+        {
+            Console.WriteLine("You have no money left.");
+            Console.WriteLine("You are kicked out of the casino.");
+            _leaveCasino = true;
+        }
     }
-
     private void DrawMessage()
     {
         Console.WriteLine("Draw!");
-        _player!.AddMoney(_currentBet);
+        _player!.AddDraw();
+        _player.AddMoney(_currentBet);
         Console.WriteLine($"Your bank: {_player.Bank}");
     }
 }
